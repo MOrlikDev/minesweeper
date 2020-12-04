@@ -2,87 +2,86 @@ package com.mariuszorlik.minesweeper.test
 
 import com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut
 import com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn
-import com.mariuszorlik.minesweeper.MatrixService
-import com.mariuszorlik.minesweeper.ui.ConsoleUserInterface
-import org.junit.jupiter.api.Assertions
+import com.mariuszorlik.minesweeper.model.Coordinates
+import com.mariuszorlik.minesweeper.service.MatrixService
+import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import kotlin.test.Ignore
 import kotlin.test.assertFailsWith
 
 class ConsoleUserInterfaceTests {
 
+    private val matrixService = MatrixService()
+
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - input = output")
+    @DisplayName("askPlayerForNumberOfMines(): input = output")
     fun askPlayerForNumberOfMines_inputEqualOutput() {
         withTextFromSystemIn("5")
             .execute {
-                Assertions.assertEquals(5, ConsoleUserInterface().askPlayerForNumberOfMines())
+                assertEquals(5, ConsoleUserInterfaceImpl().askPlayerForNumberOfMines())
             }
     }
 
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - minimum value 1")
+    @DisplayName("askPlayerForNumberOfMines(): minimum value 1")
     fun askPlayerForNumberOfMines_minValueOk() {
         withTextFromSystemIn("1")
             .execute {
-                Assertions.assertEquals(1, ConsoleUserInterface().askPlayerForNumberOfMines())
+                assertEquals(1, ConsoleUserInterfaceImpl().askPlayerForNumberOfMines())
             }
     }
 
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - minimum value 0 - Exception")
+    @DisplayName("askPlayerForNumberOfMines(): minimum value 0 - Exception")
     fun askPlayerForNumberOfMines_minValueException() {
         withTextFromSystemIn("0")
             .andExceptionThrownOnInputEnd(IllegalArgumentException())
-            .execute() {
+            .execute {
                 assertFailsWith<IllegalArgumentException>(
-                    block = { ConsoleUserInterface().askPlayerForNumberOfMines() }
+                    block = { ConsoleUserInterfaceImpl().askPlayerForNumberOfMines() }
                 )
             }
     }
 
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - maximum value 20")
+    @DisplayName("askPlayerForNumberOfMines(): maximum value 20")
     fun askPlayerForNumberOfMines_maxValueOk() {
         withTextFromSystemIn("20")
             .execute {
-                Assertions.assertEquals(20, ConsoleUserInterface().askPlayerForNumberOfMines())
+                assertEquals(20, ConsoleUserInterfaceImpl().askPlayerForNumberOfMines())
             }
     }
 
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - maximum value 21 - Exception")
+    @DisplayName("askPlayerForNumberOfMines(): maximum value 21 - Exception")
     fun askPlayerForNumberOfMines_maxValueException() {
         withTextFromSystemIn("21")
             .andExceptionThrownOnInputEnd(IllegalArgumentException())
-            .execute() {
+            .execute {
                 assertFailsWith<IllegalArgumentException>(
-                    block = { ConsoleUserInterface().askPlayerForNumberOfMines() }
+                    block = { ConsoleUserInterfaceImpl().askPlayerForNumberOfMines() }
                 )
             }
     }
 
     @Test
-    @DisplayName("askPlayerForNumberOfMines() - not an integer - Exception")
+    @DisplayName("askPlayerForNumberOfMines(): not an integer - Exception")
     fun askPlayerForNumberOfMines_notIntException() {
         withTextFromSystemIn("qwerty")
             .andExceptionThrownOnInputEnd(IllegalArgumentException())
-            .execute() {
+            .execute {
                 assertFailsWith<IllegalArgumentException>(
-                    block = { ConsoleUserInterface().askPlayerForNumberOfMines() }
+                    block = { ConsoleUserInterfaceImpl().askPlayerForNumberOfMines() }
                 )
             }
     }
 
     @Test
-    @Ignore
+    @Disabled
+    @DisplayName("drawEmptyMatrixBetter(): ok")
     fun drawEmptyMatrixBetter() {
-        val matrixService = MatrixService()
-        matrixService.generateEmptyMatrix()
-        val matrix = matrixService.matrix
-
         val expected = StringBuilder()
         expected.append("\r\n")
         expected.append("  |  1  2  3  4  5  6  7  8  9  |\r\n")
@@ -98,16 +97,15 @@ class ConsoleUserInterfaceTests {
         expected.append("9 |  .  .  .  .  .  .  .  .  .  |\r\n")
         expected.append("—-|-----------------------------|\r\n")
 
-        val actual = tapSystemOut { ConsoleUserInterface().drawMatrix(matrix) }
+        val matrix = matrixService.generateEmptyMatrix()
+        val actual = tapSystemOut { ConsoleUserInterfaceImpl().drawMatrix(matrix) }
+
         assertEquals(expected.toString(), actual)
     }
 
     @Test
+    @DisplayName("drawEmptyMatrixProper(): ok")
     fun drawEmptyMatrixProper() {
-        val matrixService = MatrixService()
-        matrixService.generateEmptyMatrix()
-        val matrix = matrixService.matrix
-
         val expected = StringBuilder()
         expected.append("\r\n")
         expected.append(" |123456789|\r\n")
@@ -123,7 +121,44 @@ class ConsoleUserInterfaceTests {
         expected.append("9|.........|\r\n")
         expected.append("—|—————————|\r\n")
 
-        val actual = tapSystemOut { ConsoleUserInterface().drawMatrix(matrix) }
+        val matrix = matrixService.generateEmptyMatrix()
+        val actual = tapSystemOut { ConsoleUserInterfaceImpl().drawMatrix(matrix) }
+
         assertEquals(expected.toString(), actual)
     }
+
+    @Test
+    @DisplayName("askPlayerForNextMove(): ok")
+    fun askPlayerForNextMove() {
+        withTextFromSystemIn("2 3")
+            .execute {
+                assertEquals(Coordinates(2, 3), ConsoleUserInterfaceImpl().askPlayerForNextMove())
+            }
+    }
+
+    @Test
+    @DisplayName("askPlayerForNextMove(): exception")
+    fun askPlayerForNextMove_exception() {
+        withTextFromSystemIn("23")
+            .andExceptionThrownOnInputEnd(IllegalArgumentException())
+            .execute {
+                assertFailsWith<IllegalArgumentException>(
+                    block = { ConsoleUserInterfaceImpl().askPlayerForNextMove() }
+                )
+            }
+    }
+
+    @Test
+    @DisplayName("drawErrorHint()")
+    fun drawErrorHint() {
+        assertEquals("There is a number here!\r\n", tapSystemOut { ConsoleUserInterfaceImpl().drawErrorHint() })
+    }
+
+    @Test
+    @DisplayName("drawEndGame()")
+    fun drawEndGame() {
+        assertEquals("Congratulations! You found all the mines!\r\n",
+            tapSystemOut { ConsoleUserInterfaceImpl().drawEndGame() })
+    }
+
 }

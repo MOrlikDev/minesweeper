@@ -1,48 +1,36 @@
 package com.mariuszorlik.minesweeper.model
 
+import java.lang.IllegalArgumentException
+
 data class Matrix(
     val cellList: MutableList<Cell> = mutableListOf(),
-    val mineList: MutableList<Cell> = mutableListOf(),
-    val matrixSize: Int = 9
+    val matrixSize: Int = 9,
 ) {
-    fun getCell(coordinates: Coordinates): Cell? {
+
+    fun getCell(coordinates: Coordinates): Cell {
         for (cell in cellList) {
-            if (coordinates.equals(cell.coordinates)) return cell
+            if (coordinates == cell.coordinates) return cell
         }
-        return null
+        throw IllegalArgumentException("There is no cell ${coordinates.x}, ${coordinates.y}")
+    }
+
+    fun getMinesList(): MutableList<Cell> {
+        val minesList = mutableListOf<Cell>()
+        for (cell in cellList) {
+            if (cell.isMine()) minesList.add(cell)
+        }
+        return minesList
     }
 
     fun getNumberOfMines(): Int {
-        return mineList.size + 1
+        return getMinesList().size
     }
 
     fun isAllMinesMarked(): Boolean {
-        if (mineList.size != getMarkedList().size) {
-            return false
-        } else {
-            for (mine in mineList) {
-                if (!isCellInMarkedList(mine)) {
-                    return false
-                }
-            }
+        for (cell in cellList) {
+            if (cell.isNonMarkedMine() || cell.isMarkedEmpty()) return false
         }
         return true
     }
 
-    private fun getMarkedList(): MutableList<Cell> {
-        val markedList = mutableListOf<Cell>()
-        for (cell in cellList) {
-            if (cell.isMarked()) markedList.add(cell)
-        }
-        return markedList
-    }
-
-    private fun isCellInMarkedList(cell: Cell): Boolean {
-        for (marked in getMarkedList()) {
-            if (cell.isTheSamePosition(marked)) {
-                return true
-            }
-        }
-        return false
-    }
 }

@@ -1,44 +1,46 @@
 package com.mariuszorlik.minesweeper
 
-import com.mariuszorlik.minesweeper.model.NextMoveProcessResult.END_GAME
-import com.mariuszorlik.minesweeper.model.NextMoveProcessResult.ERROR_HINT
-import com.mariuszorlik.minesweeper.ui.ConsoleUserInterface
-import com.mariuszorlik.minesweeper.ui.IUserInterface
+import com.mariuszorlik.minesweeper.model.Matrix
+import com.mariuszorlik.minesweeper.model.NextMoveProcessResultEnum.END_GAME
+import com.mariuszorlik.minesweeper.model.NextMoveProcessResultEnum.ERROR_HINT
+import com.mariuszorlik.minesweeper.service.MatrixService
+import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
+import com.mariuszorlik.minesweeper.view.UserInterface
 
 class GameController {
 
-    private val ui: IUserInterface = ConsoleUserInterface()
+    private val ui: UserInterface = ConsoleUserInterfaceImpl()
     private val matrixService = MatrixService()
 
     fun init() {
         val numberOfMines = ui.askPlayerForNumberOfMines()
 
-        matrixService.generateEmptyMatrix()
-        matrixService.addRandomMines(numberOfMines)
-        matrixService.checkCellsAroundMinesAndIncrementHint()
+        val matrix = matrixService.generateEmptyMatrix()
+        matrixService.addRandomMines(matrix, numberOfMines)
+        matrixService.checkCellsAroundMinesAndIncrementHint(matrix)
 
-        ui.drawMatrix(matrixService.matrix)
+        ui.drawMatrix(matrix)
 
-        play()
+        play(matrix)
     }
 
-    private fun play() {
+    private fun play(matrix: Matrix) {
         val coordinates = ui.askPlayerForNextMove()
 
-        val result = matrixService.processPlayerNextMove(coordinates)
+        val result = matrixService.processPlayerNextMove(matrix, coordinates)
 
         when (result) {
             ERROR_HINT -> {
                 ui.drawErrorHint()
-                play()
+                play(matrix)
             }
             END_GAME -> {
-                ui.drawMatrix(matrixService.matrix)
+                ui.drawMatrix(matrix)
                 ui.drawEndGame()
             }
             else -> {
-                ui.drawMatrix(matrixService.matrix)
-                play()
+                ui.drawMatrix(matrix)
+                play(matrix)
             }
         }
     }

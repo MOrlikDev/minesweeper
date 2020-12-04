@@ -1,9 +1,9 @@
-package com.mariuszorlik.minesweeper.ui
+package com.mariuszorlik.minesweeper.view
 
 import com.mariuszorlik.minesweeper.model.Coordinates
 import com.mariuszorlik.minesweeper.model.Matrix
 
-interface IUserInterface {
+interface UserInterface {
     fun askPlayerForNumberOfMines(): Int
     fun drawMatrix(matrix: Matrix)
     fun askPlayerForNextMove(): Coordinates

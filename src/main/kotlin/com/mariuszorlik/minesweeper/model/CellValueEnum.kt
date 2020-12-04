@@ -1,6 +1,6 @@
 package com.mariuszorlik.minesweeper.model
 
-enum class CellValue(val symbol: Char, val value: Int = 0, val mine: Boolean = false) {
+enum class CellValueEnum(val symbol: Char, val value: Int = 0, val mine: Boolean = false) {
     NON_MARKED_EMPTY('.', mine = false),
     NON_MARKED_MINE('.', mine = true),
     MARKED_EMPTY('*', mine = false),
@@ -17,8 +17,8 @@ enum class CellValue(val symbol: Char, val value: Int = 0, val mine: Boolean = f
     NULL(' ', 0);
 
     companion object {
-        fun findByValue(value: Int): CellValue {
-            for (enum in CellValue.values()) {
+        fun findByValue(value: Int): CellValueEnum {
+            for (enum in values()) {
                 if (value == enum.value) return enum
             }
             return NULL

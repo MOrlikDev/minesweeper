@@ -1,11 +1,11 @@
-package com.mariuszorlik.minesweeper.ui
+package com.mariuszorlik.minesweeper.view
 
-import com.mariuszorlik.minesweeper.Constants
+import com.mariuszorlik.minesweeper.model.Constants
 import com.mariuszorlik.minesweeper.model.Coordinates
 import com.mariuszorlik.minesweeper.model.Matrix
 import java.util.Scanner
 
-class ConsoleUserInterface : IUserInterface {
+class ConsoleUserInterfaceImpl : UserInterface {
 
     private val scanner = Scanner(System.`in`)
 
@@ -35,7 +35,7 @@ class ConsoleUserInterface : IUserInterface {
         for (y in 1..matrix.matrixSize) {
             val row = StringBuffer("$y|")
             for (x in 1..matrix.matrixSize) {
-                row.append(matrix.getCell(Coordinates(x, y))!!.cellValue.symbol)
+                row.append(matrix.getCell(Coordinates(x, y)).cellValue.symbol)
             }
             row.append("|")
             println(row)
@@ -43,6 +43,7 @@ class ConsoleUserInterface : IUserInterface {
         println("—|—————————|")
     }
 
+    @Deprecated("better but not proper")
     private fun drawMatrixBetter(matrix: Matrix) {
         println()
         println("  |  1  2  3  4  5  6  7  8  9  |")
@@ -50,7 +51,7 @@ class ConsoleUserInterface : IUserInterface {
         for (y in 1..matrix.matrixSize) {
             val row = StringBuffer("$y |  ")
             for (x in 1..matrix.matrixSize) {
-                row.append(matrix.getCell(Coordinates(x, y))!!.cellValue.symbol)
+                row.append(matrix.getCell(Coordinates(x, y)).cellValue.symbol)
                 row.append("  ")
             }
             row.append("|")
@@ -61,9 +62,13 @@ class ConsoleUserInterface : IUserInterface {
 
     override fun askPlayerForNextMove(): Coordinates {
         print("Set/delete mine marks (x and y coordinates): ")
-        val x = scanner.nextInt()
-        val y = scanner.nextLine().trim().toInt()
-        return Coordinates(x, y)
+        try {
+            val x = scanner.nextInt()
+            val y = scanner.nextLine().trim().toInt()
+            return Coordinates(x, y)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("You should enter two numbers 1-9 (e.g '3 6')")
+        }
     }
 
     override fun drawErrorHint() {

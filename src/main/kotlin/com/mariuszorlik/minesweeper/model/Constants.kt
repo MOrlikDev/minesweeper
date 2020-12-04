@@ -1,4 +1,4 @@
-package com.mariuszorlik.minesweeper
+package com.mariuszorlik.minesweeper.model
 
 object Constants {
     const val NUMBER_OF_MINES_MIN = 1
