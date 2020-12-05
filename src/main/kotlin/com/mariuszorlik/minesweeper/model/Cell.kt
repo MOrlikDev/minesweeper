@@ -21,6 +21,7 @@ data class Cell(
         }
     }
 
+
     fun setNonMarkedMine() {
         cellValue = CellValueEnum.NON_MARKED_MINE
     }
