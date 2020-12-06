@@ -1,9 +1,10 @@
 package com.mariuszorlik.minesweeper.test
 
 import com.mariuszorlik.minesweeper.model.Cell
-import com.mariuszorlik.minesweeper.model.CellValueEnum
+import com.mariuszorlik.minesweeper.model.CellStateEnum
 import com.mariuszorlik.minesweeper.model.Coordinates
 import com.mariuszorlik.minesweeper.test.helpers.MatrixTestHelper
+import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
 import org.junit.jupiter.api.*
 import java.lang.IllegalArgumentException
 import org.junit.jupiter.api.Assertions.*
@@ -24,7 +25,7 @@ class MatrixTests {
     @Test
     @DisplayName("getCell(): equal")
     fun getCell_equal() {
-        val expected = Cell(Coordinates(2, 3), CellValueEnum.HINT_1)
+        val expected = Cell(Coordinates(2, 3), CellStateEnum.HINT_1)
 
         val actual = helper.generateMatrixWithData().getCell(Coordinates(2, 3))
 
@@ -40,7 +41,7 @@ class MatrixTests {
     @Test
     @DisplayName("getMinesList(): ok")
     fun getMinesList() {
-        val expected = mutableListOf(Cell(Coordinates(3, 4), CellValueEnum.NON_MARKED_MINE))
+        val expected = mutableListOf(Cell(Coordinates(3, 4), CellStateEnum.MINE))
 
         val actual = helper.generateMatrixWithData().getMinesList()
 
@@ -57,8 +58,8 @@ class MatrixTests {
     @DisplayName("isAllMinesMarked(): false & wrong")
     fun isAllMinesMarked_false_wrong() {
         val actual = helper.generateMatrixWithData()
-        actual.getCell(Coordinates(3, 4)).setMark()
-        actual.getCell(Coordinates(1, 1)).setMark()
+        actual.getCell(Coordinates(3, 4)).setMarked()
+        actual.getCell(Coordinates(1, 1)).setMarked()
 
         assertFalse(actual.isAllMinesMarked())
     }
@@ -68,7 +69,7 @@ class MatrixTests {
     @DisplayName("isAllMinesMarked(): false")
     fun isAllMinesMarked_true() {
         val actual = helper.generateMatrixWithData()
-        actual.getCell(Coordinates(3, 4)).setMark()
+        actual.getCell(Coordinates(3, 4)).setMarked()
 
         assertTrue(actual.isAllMinesMarked())
     }

@@ -3,6 +3,8 @@ package com.mariuszorlik.minesweeper.test
 import com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOut
 import com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn
 import com.mariuszorlik.minesweeper.model.Coordinates
+import com.mariuszorlik.minesweeper.model.NextMove
+import com.mariuszorlik.minesweeper.model.NextMoveEnum
 import com.mariuszorlik.minesweeper.service.MatrixService
 import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -130,9 +132,9 @@ class ConsoleUserInterfaceTests {
     @Test
     @DisplayName("askPlayerForNextMove(): ok")
     fun askPlayerForNextMove() {
-        withTextFromSystemIn("2 3")
+        withTextFromSystemIn("2 3 free")
             .execute {
-                assertEquals(Coordinates(2, 3), ConsoleUserInterfaceImpl().askPlayerForNextMove())
+                assertEquals(NextMove(Coordinates(2, 3), NextMoveEnum.FREE), ConsoleUserInterfaceImpl().askPlayerForNextMove())
             }
     }
 
@@ -151,14 +153,14 @@ class ConsoleUserInterfaceTests {
     @Test
     @DisplayName("drawErrorHint()")
     fun drawErrorHint() {
-        assertEquals("There is a number here!\r\n", tapSystemOut { ConsoleUserInterfaceImpl().drawErrorHint() })
+        assertEquals("There is a number here!\r\n", tapSystemOut { ConsoleUserInterfaceImpl().printErrorHint() })
     }
 
     @Test
     @DisplayName("drawEndGame()")
     fun drawEndGame() {
         assertEquals("Congratulations! You found all the mines!\r\n",
-            tapSystemOut { ConsoleUserInterfaceImpl().drawEndGame() })
+            tapSystemOut { ConsoleUserInterfaceImpl().printEndGame() })
     }
 
 }

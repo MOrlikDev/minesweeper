@@ -1,41 +1,38 @@
 package com.mariuszorlik.minesweeper.service
 
-import com.mariuszorlik.minesweeper.model.Cell
-import com.mariuszorlik.minesweeper.model.Coordinates
-import com.mariuszorlik.minesweeper.model.Matrix
-import com.mariuszorlik.minesweeper.model.NextMoveProcessResultEnum
+import com.mariuszorlik.minesweeper.model.*
+import com.mariuszorlik.minesweeper.model.Constants.MATRIX_SIZE
 import java.lang.IllegalArgumentException
-import java.util.logging.Logger
 import kotlin.random.Random
 
 class MatrixService {
 
     fun generateEmptyMatrix(): Matrix {
         val matrix = Matrix()
-        for (x in 1..matrix.matrixSize) {
-            for (y in 1..matrix.matrixSize) {
+        for (x in 1..MATRIX_SIZE) {
+            for (y in 1..MATRIX_SIZE) {
                 matrix.cellList.add(Cell(Coordinates(x, y)))
             }
         }
         return matrix
     }
 
-    fun addRandomMines(matrix: Matrix, numberOfMinesToAdd: Int) {
-        if (numberOfMinesToAdd > 0 && matrix.getNumberOfMines() < (matrix.matrixSize * matrix.matrixSize)) {
-            val x = Random.nextInt(1, matrix.matrixSize + 1)
-            val y = Random.nextInt(1, matrix.matrixSize + 1)
+    fun addMinesInRandomPlaces(matrix: Matrix, numberOfMinesToAdd: Int) {
+        if (numberOfMinesToAdd > 0 && matrix.getNumberOfMines() < (MATRIX_SIZE * MATRIX_SIZE)) {
+            val x = Random.nextInt(1, MATRIX_SIZE + 1)
+            val y = Random.nextInt(1, MATRIX_SIZE + 1)
 
             val cell = matrix.getCell(Coordinates(x, y))
-            if (cell.isNonMarkedEmpty()) {
-                cell.setNonMarkedMine()
-                addRandomMines(matrix, numberOfMinesToAdd - 1)
+            if (cell.isFree()) {
+                cell.setMine()
+                addMinesInRandomPlaces(matrix, numberOfMinesToAdd - 1)
             } else {
-                addRandomMines(matrix, numberOfMinesToAdd)
+                addMinesInRandomPlaces(matrix, numberOfMinesToAdd)
             }
         }
     }
 
-    fun checkCellsAroundMinesAndIncrementHint(matrix: Matrix) {
+    fun addHintsAroundMines(matrix: Matrix) {
         for (cell in matrix.getMinesList()) {
 
             // x -1
@@ -54,6 +51,18 @@ class MatrixService {
         }
     }
 
+    fun setUnexploredCellsInWholeMatrix(matrix: Matrix) {
+        for (cell in matrix.cellList) {
+            cell.setUnexplored()
+        }
+    }
+
+    fun setExploredCellsInWholeMatrix(matrix: Matrix) {
+        for (cell in matrix.cellList) {
+            cell.setExplored()
+        }
+    }
+
     private fun incrementCell(matrix: Matrix, coordinates: Coordinates) {
         try {
             matrix.getCell(coordinates).incrementHint()
@@ -62,24 +71,66 @@ class MatrixService {
         }
     }
 
-    fun processPlayerNextMove(matrix: Matrix, nextMoveCoordinates: Coordinates): NextMoveProcessResultEnum {
-        val result: NextMoveProcessResultEnum
-        val cell = matrix.getCell(nextMoveCoordinates)
-        if (cell.isHint()) {
-            result = NextMoveProcessResultEnum.ERROR_HINT
-        } else {
+    fun processPlayerNextMove(matrix: Matrix, nextMove: NextMove): NextMoveResultEnum {
+        val result: NextMoveResultEnum
+        val cell = matrix.getCell(nextMove.coordinates)
+
+        if (cell.isExplored()) {
+            result = NextMoveResultEnum.EXPLORED
+        } else if (nextMove.nextMoveEnum == NextMoveEnum.FREE) {
+
+            if (cell.isMine()) {
+                result = NextMoveResultEnum.GAME_OVER
+            } else {
+
+                discoverFreeCells(matrix, cell)
+                result = NextMoveResultEnum.CONTINUE
+
+            }
+
+        } else if (nextMove.nextMoveEnum == NextMoveEnum.MINE) {
+
             if (cell.isMarked()) {
-                cell.setUnmark()
-            } else if (cell.isNonMarked()) {
-                cell.setMark()
+                cell.setUnmarked()
+            } else if (!cell.isMarked()) {
+                cell.setMarked()
             }
 
             if (matrix.isAllMinesMarked()) {
-                result = NextMoveProcessResultEnum.END_GAME
+                result = NextMoveResultEnum.END_GAME
             } else {
-                result = NextMoveProcessResultEnum.CONTINUE
+                result = NextMoveResultEnum.CONTINUE
             }
+
+        } else {
+            throw IllegalArgumentException()
         }
+
         return result
     }
+
+    fun discoverFreeCells(matrix: Matrix, cell: Cell) {
+
+        if (!cell.isNull() && !cell.isExplored()) {
+
+            if (cell.isFree()) {
+                cell.setExplored()
+
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x - 1, cell.coordinates.y - 1)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x - 1, cell.coordinates.y)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x - 1, cell.coordinates.y + 1)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x, cell.coordinates.y - 1)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x, cell.coordinates.y + 1)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x + 1, cell.coordinates.y - 1)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x + 1, cell.coordinates.y)))
+                discoverFreeCells(matrix, matrix.getCell(Coordinates(cell.coordinates.x + 1, cell.coordinates.y + 1)))
+
+            } else if (cell.isHint()) {
+                cell.setExplored()
+            }
+
+        }
+
+    }
 }
+

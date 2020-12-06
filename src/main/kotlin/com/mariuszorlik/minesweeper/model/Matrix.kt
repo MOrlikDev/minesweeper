@@ -4,14 +4,14 @@ import java.lang.IllegalArgumentException
 
 data class Matrix(
     val cellList: MutableList<Cell> = mutableListOf(),
-    val matrixSize: Int = 9,
 ) {
 
     fun getCell(coordinates: Coordinates): Cell {
         for (cell in cellList) {
             if (coordinates == cell.coordinates) return cell
         }
-        throw IllegalArgumentException("There is no cell ${coordinates.x}, ${coordinates.y}")
+        return Cell(Coordinates(0, 0))
+//        throw IllegalArgumentException("There is no cell ${coordinates.x}, ${coordinates.y}")
     }
 
     fun getMinesList(): MutableList<Cell> {
@@ -28,7 +28,7 @@ data class Matrix(
 
     fun isAllMinesMarked(): Boolean {
         for (cell in cellList) {
-            if (cell.isNonMarkedMine() || cell.isMarkedEmpty()) return false
+            if ((cell.isMine() && !cell.isMarked()) || (!cell.isMine() && cell.isMarked())) return false
         }
         return true
     }

@@ -1,8 +1,7 @@
 package com.mariuszorlik.minesweeper
 
 import com.mariuszorlik.minesweeper.model.Matrix
-import com.mariuszorlik.minesweeper.model.NextMoveProcessResultEnum.END_GAME
-import com.mariuszorlik.minesweeper.model.NextMoveProcessResultEnum.ERROR_HINT
+import com.mariuszorlik.minesweeper.model.NextMoveResultEnum.*
 import com.mariuszorlik.minesweeper.service.MatrixService
 import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
 import com.mariuszorlik.minesweeper.view.UserInterface
@@ -16,8 +15,9 @@ class GameController {
         val numberOfMines = ui.askPlayerForNumberOfMines()
 
         val matrix = matrixService.generateEmptyMatrix()
-        matrixService.addRandomMines(matrix, numberOfMines)
-        matrixService.checkCellsAroundMinesAndIncrementHint(matrix)
+        matrixService.addMinesInRandomPlaces(matrix, numberOfMines)
+        matrixService.addHintsAroundMines(matrix)
+        matrixService.setUnexploredCellsInWholeMatrix(matrix)
 
         ui.drawMatrix(matrix)
 
@@ -25,18 +25,23 @@ class GameController {
     }
 
     private fun play(matrix: Matrix) {
-        val coordinates = ui.askPlayerForNextMove()
+        val nextMove = ui.askPlayerForNextMove()
 
-        val result = matrixService.processPlayerNextMove(matrix, coordinates)
+        val result = matrixService.processPlayerNextMove(matrix, nextMove)
 
         when (result) {
             ERROR_HINT -> {
-                ui.drawErrorHint()
+                ui.printErrorHint()
                 play(matrix)
+            }
+            GAME_OVER -> {
+                matrixService.setExploredCellsInWholeMatrix(matrix)
+                ui.drawMatrix(matrix)
+                ui.printGameOver()
             }
             END_GAME -> {
                 ui.drawMatrix(matrix)
-                ui.drawEndGame()
+                ui.printEndGame()
             }
             else -> {
                 ui.drawMatrix(matrix)

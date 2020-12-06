@@ -1,6 +1,8 @@
 package com.mariuszorlik.minesweeper.test.helpers
 
 import com.mariuszorlik.minesweeper.model.Cell
+import com.mariuszorlik.minesweeper.model.Constants
+import com.mariuszorlik.minesweeper.model.Constants.MATRIX_SIZE
 import com.mariuszorlik.minesweeper.model.Coordinates
 import com.mariuszorlik.minesweeper.model.Matrix
 
@@ -8,8 +10,8 @@ class MatrixServiceTestHelper {
 
     fun generateEmptyMatrixForTest(): Matrix {
         val expected = Matrix()
-        for (x in 1..expected.matrixSize) {
-            for (y in 1..expected.matrixSize) {
+        for (x in 1..MATRIX_SIZE) {
+            for (y in 1..MATRIX_SIZE) {
                 expected.cellList.add(Cell(Coordinates(x, y)))
             }
         }

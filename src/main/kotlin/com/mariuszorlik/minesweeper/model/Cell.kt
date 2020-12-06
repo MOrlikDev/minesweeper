@@ -2,56 +2,60 @@ package com.mariuszorlik.minesweeper.model
 
 data class Cell(
     val coordinates: Coordinates = Coordinates(),
-    var cellValue: CellValueEnum = CellValueEnum.NON_MARKED_EMPTY,
+    var cellState: CellStateEnum = CellStateEnum.FREE,
+    var explored: Boolean = false,
+    var marked: Boolean = false,
 ) {
 
-    fun setMark() {
-        if (cellValue == CellValueEnum.NON_MARKED_EMPTY) {
-            cellValue = CellValueEnum.MARKED_EMPTY
-        } else if (cellValue == CellValueEnum.NON_MARKED_MINE) {
-            cellValue = CellValueEnum.MARKED_MINE
-        }
+    fun isNull(): Boolean {
+        return coordinates.x == 0 && coordinates.y == 0
     }
 
-    fun setUnmark() {
-        if (cellValue == CellValueEnum.MARKED_EMPTY) {
-            cellValue = CellValueEnum.NON_MARKED_EMPTY
-        } else if (cellValue == CellValueEnum.MARKED_MINE) {
-            cellValue = CellValueEnum.NON_MARKED_MINE
-        }
+    fun setUnexplored() {
+        explored = false
     }
 
-
-    fun setNonMarkedMine() {
-        cellValue = CellValueEnum.NON_MARKED_MINE
+    fun setExplored() {
+        explored = true
     }
 
-    fun isNonMarkedEmpty(): Boolean {
-        return cellValue == CellValueEnum.NON_MARKED_EMPTY
+    fun isExplored(): Boolean {
+        return explored
     }
 
-    fun isNonMarkedMine(): Boolean {
-        return cellValue == CellValueEnum.NON_MARKED_MINE
+    fun setMarked() {
+        marked = true
     }
 
-    fun isMarkedEmpty(): Boolean {
-        return cellValue == CellValueEnum.MARKED_EMPTY
-    }
-
-    fun isMine(): Boolean {
-        return cellValue == CellValueEnum.NON_MARKED_MINE || cellValue == CellValueEnum.MARKED_MINE
+    fun setUnmarked() {
+        marked = false
     }
 
     fun isMarked(): Boolean {
-        return cellValue == CellValueEnum.MARKED_MINE || cellValue == CellValueEnum.MARKED_EMPTY
+        return marked
     }
 
-    fun isNonMarked(): Boolean {
-        return cellValue == CellValueEnum.NON_MARKED_EMPTY || cellValue == CellValueEnum.NON_MARKED_MINE
+    fun setMine() {
+        cellState = CellStateEnum.MINE
+    }
+
+    fun isMine(): Boolean {
+        return cellState == CellStateEnum.MINE
+    }
+
+    fun isFree(): Boolean {
+        return cellState == CellStateEnum.FREE
     }
 
     fun isHint(): Boolean {
-        return cellValue.value in CellValueEnum.HINT_1.value..CellValueEnum.HINT_9.value
+        return cellState.value in CellStateEnum.HINT_1.value..CellStateEnum.HINT_8.value
+    }
+
+
+    fun getSymbol(): Char {
+        if (explored) return cellState.symbol
+        else if (marked) return CellStateEnum.MARKED.symbol
+        else return CellStateEnum.UNEXPLORED.symbol
     }
 
     fun isTheSamePosition(cell: Cell): Boolean {
@@ -59,11 +63,11 @@ data class Cell(
     }
 
     fun incrementHint() {
-        if (!isMine() && cellValue != CellValueEnum.HINT_9) {
-            cellValue = if (cellValue == CellValueEnum.NON_MARKED_EMPTY) {
-                CellValueEnum.HINT_1
+        if (!isMine() && cellState != CellStateEnum.HINT_8) {
+            cellState = if (cellState == CellStateEnum.FREE) {
+                CellStateEnum.HINT_1
             } else {
-                CellValueEnum.findByValue(cellValue.value + 1)
+                CellStateEnum.findByValue(cellState.value + 1)
             }
         }
     }
