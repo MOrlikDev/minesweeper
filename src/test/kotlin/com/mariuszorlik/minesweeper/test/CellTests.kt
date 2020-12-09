@@ -7,15 +7,16 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
-class CellTests {
+internal class CellTests {
 
     @Nested
-    inner class Setters {
+    internal inner class Setters {
 
         @Test
         @DisplayName("setMarked(): ok")
-        fun setMarked() {
+        internal fun setMarked() {
             val expected = Cell(marked = true)
 
             val actual = Cell(marked = false)
@@ -25,8 +26,8 @@ class CellTests {
         }
 
         @Test
-        @DisplayName("setUnmark(): ok")
-        fun setUnmarked() {
+        @DisplayName("setUnmarked(): ok")
+        internal fun setUnmarked() {
             val expected = Cell(marked = false)
 
             val actual = Cell(marked = true)
@@ -36,8 +37,8 @@ class CellTests {
         }
 
         @Test
-        @DisplayName("setExmploted(): ok")
-        fun setExmploted() {
+        @DisplayName("setExplored(): ok")
+        internal fun setExplored() {
             val expected = Cell(explored = true)
 
             val actual = Cell(explored = false)
@@ -49,11 +50,11 @@ class CellTests {
     }
 
     @Nested
-    inner class Getters {
+    internal inner class Getters {
 
         @Test
         @DisplayName("isMine(): true")
-        fun isMine_true() {
+        internal fun isMine_true() {
             val actual = Cell(cellState = CellStateEnum.MINE)
 
             assertTrue(actual.isMine())
@@ -61,7 +62,7 @@ class CellTests {
 
         @Test
         @DisplayName("isMine(): false")
-        fun isMine_false() {
+        internal fun isMine_false() {
             val actual = Cell(cellState = CellStateEnum.FREE)
 
             assertFalse(actual.isMine())
@@ -69,7 +70,7 @@ class CellTests {
 
         @Test
         @DisplayName("isFree(): true")
-        fun isFree_true() {
+        internal fun isFree_true() {
             val actual = Cell(cellState = CellStateEnum.FREE)
 
             assertTrue(actual.isFree())
@@ -77,7 +78,7 @@ class CellTests {
 
         @Test
         @DisplayName("isFree(): false")
-        fun isFree_false() {
+        internal fun isFree_false() {
             val actual = Cell(cellState = CellStateEnum.MINE)
 
             assertFalse(actual.isFree())
@@ -85,7 +86,7 @@ class CellTests {
 
         @Test
         @DisplayName("isHint(): HINT_1..HINT_8 -> true")
-        fun isHint_1_8() {
+        internal fun isHint_1_8() {
             val actual1 = Cell(cellState = CellStateEnum.HINT_1)
             val actual2 = Cell(cellState = CellStateEnum.HINT_2)
             val actual3 = Cell(cellState = CellStateEnum.HINT_3)
@@ -107,7 +108,7 @@ class CellTests {
 
         @Test
         @DisplayName("isHint(): !hint -> false")
-        fun isHint_false() {
+        internal fun isHint_false() {
             val actual1 = Cell(cellState = CellStateEnum.FREE)
             val actual2 = Cell(cellState = CellStateEnum.MINE)
 
@@ -115,11 +116,23 @@ class CellTests {
             assertFalse(actual2.isHint())
         }
 
+        @Test
+        @DisplayName("cell.isNull():")
+        internal fun isNull() {
+            assertTrue(Cell(Coordinates(0,0)).isNull())
+        }
+
+        @Test
+        @DisplayName("cell.isNull():")
+        internal fun isNull_false() {
+            assertFalse(Cell(Coordinates(1,1)).isNull())
+        }
+
     }
 
     @Test
     @DisplayName("isTheSamePosition(): true")
-    fun isTheSamePosition_true() {
+    internal fun isTheSamePosition_true() {
         val expected = Cell(Coordinates(2, 3))
 
         val actual = Cell(Coordinates(2, 3))
@@ -128,7 +141,7 @@ class CellTests {
 
     @Test
     @DisplayName("isTheSamePosition(): false")
-    fun isTheSamePosition_false() {
+    internal fun isTheSamePosition_false() {
         val expected = Cell(Coordinates(2, 3))
 
         val actual = Cell(Coordinates(4, 5))
@@ -137,7 +150,7 @@ class CellTests {
 
     @Test
     @DisplayName("incrementHint(): no change")
-    fun incrementHint_noChange() {
+    internal fun incrementHint_noChange() {
         val expectation = Cell(cellState = CellStateEnum.MINE)
 
         val actual = Cell(cellState = CellStateEnum.MINE)
@@ -148,7 +161,7 @@ class CellTests {
 
     @Test
     @DisplayName("incrementHint(): free -> 1")
-    fun incrementHint_free_1() {
+    internal fun incrementHint_free_1() {
         val expectation = Cell(cellState = CellStateEnum.HINT_1)
 
         val actual = Cell(cellState = CellStateEnum.FREE)
@@ -159,7 +172,7 @@ class CellTests {
 
     @Test
     @DisplayName("incrementHint(): 5 -> 6")
-    fun incrementHint_5_6() {
+    internal fun incrementHint_5_6() {
         val expectation = Cell(cellState = CellStateEnum.HINT_6)
 
         val actual = Cell(cellState = CellStateEnum.HINT_5)
@@ -170,13 +183,19 @@ class CellTests {
 
     @Test
     @DisplayName("incrementHint(): 8 -> 8")
-    fun incrementHint_9() {
+    internal fun incrementHint_9() {
         val expectation = Cell(cellState = CellStateEnum.HINT_8)
 
         val actual = Cell(cellState = CellStateEnum.HINT_8)
         actual.incrementHint()
 
         assertEquals(expectation, actual)
+    }
+
+    @Test
+    @DisplayName("CellStateEnum.findByValue(): exception")
+    internal fun cellStateEnum_findByValue_exception() {
+        assertFailsWith<java.lang.IllegalArgumentException> { CellStateEnum.findByValue(123) }
     }
 
 }

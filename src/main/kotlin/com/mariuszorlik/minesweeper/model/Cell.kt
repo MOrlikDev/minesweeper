@@ -51,11 +51,12 @@ data class Cell(
         return cellState.value in CellStateEnum.HINT_1.value..CellStateEnum.HINT_8.value
     }
 
-
     fun getSymbol(): Char {
-        if (explored) return cellState.symbol
-        else if (marked) return CellStateEnum.MARKED.symbol
-        else return CellStateEnum.UNEXPLORED.symbol
+        return when {
+            explored -> cellState.symbol
+            marked -> CellStateEnum.MARKED.symbol
+            else -> CellStateEnum.UNEXPLORED.symbol
+        }
     }
 
     fun isTheSamePosition(cell: Cell): Boolean {

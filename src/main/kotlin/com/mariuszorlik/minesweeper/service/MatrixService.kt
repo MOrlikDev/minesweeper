@@ -63,53 +63,73 @@ class MatrixService {
         }
     }
 
-    private fun incrementCell(matrix: Matrix, coordinates: Coordinates) {
-        try {
-            matrix.getCell(coordinates).incrementHint()
-        } catch (e: IllegalArgumentException) {
-//            Logger.getLogger(MatrixService::class.java.name).info()
-        }
-    }
-
     fun processPlayerNextMove(matrix: Matrix, nextMove: NextMove): NextMoveResultEnum {
         val result: NextMoveResultEnum
         val cell = matrix.getCell(nextMove.coordinates)
 
-        if (cell.isExplored()) {
-            result = NextMoveResultEnum.EXPLORED
-        } else if (nextMove.nextMoveEnum == NextMoveEnum.FREE) {
-
-            if (cell.isMine()) {
-                result = NextMoveResultEnum.GAME_OVER
-            } else {
-
-                discoverFreeCells(matrix, cell)
-                result = NextMoveResultEnum.CONTINUE
-
+        result = when {
+            cell.isExplored() -> {
+                nextMoveExplored()
             }
-
-        } else if (nextMove.nextMoveEnum == NextMoveEnum.MINE) {
-
-            if (cell.isMarked()) {
-                cell.setUnmarked()
-            } else if (!cell.isMarked()) {
-                cell.setMarked()
+            nextMove.nextMoveEnum == NextMoveEnum.FREE -> {
+                nextMoveFree(matrix, cell)
             }
-
-            if (matrix.isAllMinesMarked()) {
-                result = NextMoveResultEnum.END_GAME
-            } else {
-                result = NextMoveResultEnum.CONTINUE
+            nextMove.nextMoveEnum == NextMoveEnum.MINE -> {
+                nextMoveMine(matrix, cell)
             }
-
-        } else {
-            throw IllegalArgumentException()
+            else -> {
+                throw IllegalArgumentException()
+            }
         }
 
         return result
     }
 
-    fun discoverFreeCells(matrix: Matrix, cell: Cell) {
+    private fun incrementCell(matrix: Matrix, coordinates: Coordinates) {
+        matrix.getCell(coordinates).incrementHint()
+    }
+
+    private fun nextMoveMine(matrix: Matrix, cell: Cell): NextMoveResultEnum {
+        nextMoveMarkCell(cell)
+
+        return if (matrix.isAllMinesMarked()) {
+            NextMoveResultEnum.END_GAME
+        } else {
+            NextMoveResultEnum.CONTINUE
+        }
+
+    }
+
+    private fun nextMoveFree(matrix: Matrix, cell: Cell): NextMoveResultEnum {
+        return if (cell.isMine()) {
+            nextMoveGameOver()
+        } else {
+            nextMoveContinue(matrix, cell)
+        }
+    }
+
+    private fun nextMoveMarkCell(cell: Cell) {
+        if (cell.isMarked()) {
+            cell.setUnmarked()
+        } else if (!cell.isMarked()) {
+            cell.setMarked()
+        }
+    }
+
+    private fun nextMoveContinue(matrix: Matrix, cell: Cell): NextMoveResultEnum {
+        discoverFreeCells(matrix, cell)
+        return NextMoveResultEnum.CONTINUE
+    }
+
+    private fun nextMoveGameOver(): NextMoveResultEnum {
+        return NextMoveResultEnum.GAME_OVER
+    }
+
+    private fun nextMoveExplored(): NextMoveResultEnum {
+        return NextMoveResultEnum.EXPLORED
+    }
+
+    private fun discoverFreeCells(matrix: Matrix, cell: Cell) {
 
         if (!cell.isNull() && !cell.isExplored()) {
 

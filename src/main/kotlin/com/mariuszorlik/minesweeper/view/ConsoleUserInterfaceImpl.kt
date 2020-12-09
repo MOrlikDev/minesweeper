@@ -42,22 +42,22 @@ class ConsoleUserInterfaceImpl : UserInterface {
         println("—|—————————|")
     }
 
-    @Deprecated("better but not proper")
-    private fun drawMatrixBetter(matrix: Matrix) {
-        println()
-        println("  |  1  2  3  4  5  6  7  8  9  |")
-        println("—-|-----------------------------|")
-        for (y in 1..MATRIX_SIZE) {
-            val row = StringBuffer("$y |  ")
-            for (x in 1..MATRIX_SIZE) {
-                row.append(matrix.getCell(Coordinates(x, y)).cellState.symbol)
-                row.append("  ")
-            }
-            row.append("|")
-            println(row)
-        }
-        println("—-|-----------------------------|")
-    }
+//    @Deprecated("better but not proper")
+//    private fun drawMatrixBetter(matrix: Matrix) {
+//        println()
+//        println("  |  1  2  3  4  5  6  7  8  9  |")
+//        println("—-|-----------------------------|")
+//        for (y in 1..MATRIX_SIZE) {
+//            val row = StringBuffer("$y |  ")
+//            for (x in 1..MATRIX_SIZE) {
+//                row.append(matrix.getCell(Coordinates(x, y)).cellState.symbol)
+//                row.append("  ")
+//            }
+//            row.append("|")
+//            println(row)
+//        }
+//        println("—-|-----------------------------|")
+//    }
 
     override fun askPlayerForNextMove(): NextMove {
         print("Set/unset mine marks or claim a cell as free: ")

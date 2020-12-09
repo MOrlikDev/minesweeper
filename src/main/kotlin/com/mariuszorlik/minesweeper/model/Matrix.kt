@@ -1,7 +1,5 @@
 package com.mariuszorlik.minesweeper.model
 
-import java.lang.IllegalArgumentException
-
 data class Matrix(
     val cellList: MutableList<Cell> = mutableListOf(),
 ) {

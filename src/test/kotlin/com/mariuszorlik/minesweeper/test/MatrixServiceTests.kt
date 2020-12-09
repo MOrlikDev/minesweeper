@@ -5,7 +5,6 @@ import com.mariuszorlik.minesweeper.model.Constants.MATRIX_SIZE
 import com.mariuszorlik.minesweeper.service.MatrixService
 import com.mariuszorlik.minesweeper.test.helpers.MatrixServiceTestHelper
 import com.mariuszorlik.minesweeper.test.helpers.MatrixTestHelper
-import com.mariuszorlik.minesweeper.view.ConsoleUserInterfaceImpl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -14,7 +13,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MatrixServiceTests {
+internal class MatrixServiceTests {
 
     private val matrixService: MatrixService = MatrixService()
     private val serviceHelper: MatrixServiceTestHelper = MatrixServiceTestHelper()
@@ -22,7 +21,7 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("generateEmptyMatrix(): ok")
-    fun generateEmptyMatrix() {
+    internal fun generateEmptyMatrix() {
         val expectedNumberOfCells = MATRIX_SIZE * MATRIX_SIZE
         val expectedCellState = CellStateEnum.FREE
 
@@ -41,7 +40,7 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("addMinesInRandomPlaces(): 5=5")
-    fun addMinesInRandomPlaces() {
+    internal fun addMinesInRandomPlaces() {
         val matrix = serviceHelper.generateEmptyMatrixForTest()
         matrixService.addMinesInRandomPlaces(matrix, 5)
 
@@ -50,7 +49,7 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("addHintsAroundMines(): ok")
-    fun addHintsAroundMines() {
+    internal fun addHintsAroundMines() {
         val matrix = serviceHelper.generateEmptyMatrixForTest()
         matrix.getCell(Coordinates(2, 2)).setMine()
 
@@ -72,7 +71,7 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("setUnexploredCellsInWholeMatrix(): ok")
-    fun setUnexploredCellsInWholeMatrix(){
+    internal fun setUnexploredCellsInWholeMatrix(){
         val matrix = serviceHelper.generateEmptyMatrixForTest()
         matrix.getCell(Coordinates(2, 2)).setMine()
         matrixService.addHintsAroundMines(matrix)
@@ -86,17 +85,16 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("processPlayerNextMove(): EXPLORED")
-    fun processPlayerNextMove_EXPLORED() {
+    internal fun processPlayerNextMove_EXPLORED() {
         val matrix = matrixHelper.generateMatrixWithData()
         matrix.getCell(Coordinates(2,3)).setExplored()
-//        ConsoleUserInterfaceImpl().drawMatrix(matrix)
 
         assertEquals(NextMoveResultEnum.EXPLORED, matrixService.processPlayerNextMove(matrix, NextMove(Coordinates(2, 3), NextMoveEnum.FREE)))
     }
 
     @Test
     @DisplayName("processPlayerNextMove(): HINT -> CONTINUE")
-    fun processPlayerNextMove_HINT_CONTINUE() {
+    internal fun processPlayerNextMove_HINT_CONTINUE() {
         val matrix = matrixHelper.generateMatrixWithData()
 
         assertEquals(NextMoveResultEnum.CONTINUE, matrixService.processPlayerNextMove(matrix, NextMove(Coordinates(2, 3), NextMoveEnum.FREE)))
@@ -104,7 +102,7 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("processPlayerNextMove(): FREE -> CONTINUE")
-    fun processPlayerNextMove_FREE_CONTINUE() {
+    internal fun processPlayerNextMove_FREE_CONTINUE() {
         val matrix = matrixHelper.generateMatrixWithData()
 
         assertEquals(NextMoveResultEnum.CONTINUE, matrixService.processPlayerNextMove(matrix, NextMove(Coordinates(1, 1), NextMoveEnum.FREE)))
@@ -112,12 +110,29 @@ class MatrixServiceTests {
 
     @Test
     @DisplayName("processPlayerNextMove(): END_GAME")
-    fun processPlayerNextMove_END_GAME() {
+    internal fun processPlayerNextMove_END_GAME() {
         val matrix = matrixHelper.generateMatrixWithData()
 
         assertEquals(NextMoveResultEnum.END_GAME, matrixService.processPlayerNextMove(matrix, NextMove(Coordinates(3, 4), NextMoveEnum.MINE)))
     }
 
 
+    @Test
+    @DisplayName("setExploredCellsInWholeMatrix(): false")
+    internal fun setExploredCellsInWholeMatrix() {
+        val expected = matrixHelper.generateMatrixWithData()
+        for(cell in expected.cellList) {
+            cell.setExplored()
+        }
 
+        val actual = matrixHelper.generateMatrixWithData()
+        matrixService.setExploredCellsInWholeMatrix(actual)
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    internal fun constants() {
+        Assertions.assertNotNull(Constants)
+    }
 }

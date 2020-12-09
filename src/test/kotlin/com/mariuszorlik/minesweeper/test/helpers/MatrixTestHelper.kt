@@ -1,14 +1,13 @@
 package com.mariuszorlik.minesweeper.test.helpers
 
 import com.mariuszorlik.minesweeper.model.Cell
-import com.mariuszorlik.minesweeper.model.Constants
 import com.mariuszorlik.minesweeper.model.Constants.MATRIX_SIZE
 import com.mariuszorlik.minesweeper.model.Coordinates
 import com.mariuszorlik.minesweeper.model.Matrix
 
-class MatrixTestHelper {
+internal class MatrixTestHelper {
 
-    fun generateMatrixWithData(): Matrix {
+    internal fun generateMatrixWithData(): Matrix {
         val matrix = Matrix()
         for (x in 1..MATRIX_SIZE) {
             for (y in 1..MATRIX_SIZE) {
