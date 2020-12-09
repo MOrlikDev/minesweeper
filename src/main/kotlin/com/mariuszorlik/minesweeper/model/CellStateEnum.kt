@@ -5,7 +5,7 @@ import java.lang.IllegalArgumentException
 enum class CellStateEnum(val symbol: Char, val value: Int = 0) {
 
     UNEXPLORED('.'),
-    MARKED('X'),
+    MARKED('*'),
 
     FREE('/'),
     MINE('X'),

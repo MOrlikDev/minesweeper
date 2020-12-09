@@ -2,6 +2,8 @@ package com.mariuszorlik.minesweeper.view
 
 import com.mariuszorlik.minesweeper.model.*
 import com.mariuszorlik.minesweeper.model.Constants.MATRIX_SIZE
+import com.mariuszorlik.minesweeper.model.Constants.NUMBER_OF_MINES_MAX
+import com.mariuszorlik.minesweeper.model.Constants.NUMBER_OF_MINES_MIN
 import java.util.Scanner
 
 class ConsoleUserInterfaceImpl : UserInterface {
@@ -12,13 +14,13 @@ class ConsoleUserInterfaceImpl : UserInterface {
         print("How many mines do you want on the field? ")
         try {
             val numberOfMine = scanner.nextInt()
-            if (numberOfMine < Constants.NUMBER_OF_MINES_MIN || numberOfMine > Constants.NUMBER_OF_MINES_MAX) {
-                throw IllegalArgumentException("The number of mines should be between 1 and 20")
+            if (numberOfMine < NUMBER_OF_MINES_MIN || numberOfMine > NUMBER_OF_MINES_MAX) {
+                throw IllegalArgumentException("The number of mines should be between $NUMBER_OF_MINES_MIN and $NUMBER_OF_MINES_MAX")
             } else {
                 return numberOfMine
             }
         } catch (e: Exception) {
-            throw IllegalArgumentException("The number of mines should be between 1 and 20")
+            throw IllegalArgumentException("The number of mines should be between $NUMBER_OF_MINES_MIN and $NUMBER_OF_MINES_MAX")
         }
     }
 
